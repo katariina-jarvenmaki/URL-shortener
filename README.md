@@ -18,3 +18,10 @@ http://127.0.0.1:8000/docs
 
 Test Short URL Endpoint
 http://127.0.0.1:8000/shorten
+
+## Running a test
+```bash
+PYTHONPATH=./ pytest
+export PYTHONPATH=$(pwd)
+pytest
+ ```
