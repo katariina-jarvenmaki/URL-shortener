@@ -2,9 +2,11 @@
 URL-shortener project to showcase python use
 
 ## Create venv
+```bash
 cd /opt/kjc/int/URL-shortener
 python3 -m venv venv
 source venv/bin/activate
+```
 
 ## Run locally
 ```bash
