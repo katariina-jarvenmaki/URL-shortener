@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 # Database connection setup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    conn = sqlite3.connect('urls.db')
     conn = sqlite3.connect(settings.database_url)
     conn.execute("""
     CREATE TABLE IF NOT EXISTS urls (
