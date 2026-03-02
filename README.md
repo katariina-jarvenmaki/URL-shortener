@@ -12,11 +12,11 @@ source venv/bin/activate
 ```bash
 uvicorn app.main:app --reload
 ```
-Then check: 
-http://127.0.0.1:8000 
+Then check:<br> 
+http://127.0.0.1:8000<br>
 http://127.0.0.1:8000/docs
 
-Test Short URL Endpoint
+Test Short URL Endpoint:<br>
 http://127.0.0.1:8000/shorten
 
 ## Running a test
