@@ -1,12 +1,17 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from contextlib import asynccontextmanager
-from pydantic import BaseModel
 from app.utils import generate_short_code
-from dotenv import load_dotenv
-import os
+from pydantic import BaseModel, HttpUrl
+from pydantic_settings import BaseSettings
 import sqlite3
 import logging
+
+class AppSettings(BaseSettings):
+    base_url: str = "http://localhost:8000"
+    database_url: str = "urls.db"
+
+settings = AppSettings()  # Load environment variables
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO,
@@ -16,9 +21,18 @@ logger = logging.getLogger(__name__)
 # Database connection setup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    conn = sqlite3.connect('urls.db')
-    conn.execute('''CREATE TABLE IF NOT EXISTS urls
-                    (id INTEGER PRIMARY KEY, short_code TEXT, original_url TEXT, clicks INTEGER)''')
+    conn = sqlite3.connect(settings.database_url)
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS urls (
+        id INTEGER PRIMARY KEY,
+        short_code TEXT UNIQUE,
+        original_url TEXT NOT NULL,
+        clicks INTEGER DEFAULT 0
+    );
+    """)
+    conn.execute("""
+    CREATE INDEX IF NOT EXISTS idx_short_code ON urls(short_code);
+    """)
     conn.commit()
     logger.info("Database initialized or already exists.")
     yield
@@ -28,11 +42,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 def get_db_connection():
-    conn = sqlite3.connect('urls.db')
-    return conn
+    return sqlite3.connect(settings.database_url, check_same_thread=False)
 
 class URLRequest(BaseModel):
-    url: str
+    url: HttpUrl
 
 @app.get("/")
 def home():
@@ -41,36 +54,71 @@ def home():
 
 @app.post("/shorten")
 def shorten_url(request: URLRequest):
-    logger.info(f"Request received to shorten URL: {request.url}")
-    short_code = generate_short_code()
     conn = get_db_connection()
 
-    while conn.execute("SELECT 1 FROM urls WHERE short_code = ?", (short_code,)).fetchone():
+    existing = conn.execute(
+        "SELECT short_code FROM urls WHERE original_url = ?",
+        (str(request.url),)
+    ).fetchone()
+
+    if existing:
+        conn.close()
+        return {"short_url": f"{settings.base_url}/{existing[0]}"}
+
+    short_code = generate_short_code()
+    while conn.execute(
+        "SELECT 1 FROM urls WHERE short_code = ?",
+        (short_code,)
+    ).fetchone():
         short_code = generate_short_code()
 
-    conn.execute("INSERT INTO urls (short_code, original_url, clicks) VALUES (?, ?, ?)",
-                 (short_code, request.url, 0))
+    conn.execute(
+        "INSERT INTO urls (short_code, original_url, clicks) VALUES (?, ?, 0)",
+        (short_code, str(request.url))
+    )
     conn.commit()
     conn.close()
 
-    short_url = f"{os.getenv('BASE_URL', 'http://localhost:8000')}/{short_code}"
-    logger.info(f"Shortened URL created: {short_url}")
-    return {"short_url": short_url}
+    return {"short_url": f"{settings.base_url}/{short_code}"}
 
 @app.get("/{short_code}")
 def redirect_to_url(short_code: str):
-    logger.info(f"Redirect request received for short_code: {short_code}")
     conn = get_db_connection()
-    url_data = conn.execute("SELECT original_url, clicks FROM urls WHERE short_code = ?", (short_code,)).fetchone()
+    url_data = conn.execute(
+        "SELECT original_url FROM urls WHERE short_code = ?",
+        (short_code,)
+    ).fetchone()
 
     if url_data is None:
-        logger.warning(f"Shortened URL for {short_code} not found.")
+        conn.close()
         raise HTTPException(status_code=404, detail="Shortened URL not found")
 
-    original_url, clicks = url_data
-    conn.execute("UPDATE urls SET clicks = ? WHERE short_code = ?", (clicks + 1, short_code))
+    original_url = url_data[0]
+
+    conn.execute(
+        "UPDATE urls SET clicks = clicks + 1 WHERE short_code = ?",
+        (short_code,)
+    )
     conn.commit()
     conn.close()
 
-    logger.info(f"Redirecting to {original_url}. Total clicks: {clicks + 1}")
     return RedirectResponse(url=original_url)
+
+@app.get("/stats/{short_code}")
+def get_url_stats(short_code: str):
+    logger.info(f"Stats request received for short_code: {short_code}")
+    conn = get_db_connection()
+    url_data = conn.execute("SELECT original_url, clicks FROM urls WHERE short_code = ?", (short_code,)).fetchone()
+    
+    if url_data is None: 
+        logger.warning(f"Stats not found for {short_code}.")
+        conn.close()
+        raise HTTPException(status_code=404, detail="URL stats not found")
+        
+    original_url, clicks = url_data
+    
+    conn.close()
+    
+    logger.info(f"Returning stats for {original_url}. Total clicks: {clicks}")
+    
+    return {"original_url": original_url, "clicks": clicks}
