@@ -4,9 +4,17 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.main import app
+from app.main import settings
+import tempfile
+import pytest
 
 client = TestClient(app)
+
+@pytest.fixture(autouse=True)
+def use_temp_db():
+    with tempfile.NamedTemporaryFile() as tmp:
+        settings.database_url = tmp.name
+        yield
 
 def test_home():
     response = client.get("/")

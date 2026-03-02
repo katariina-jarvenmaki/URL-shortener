@@ -104,3 +104,22 @@ def redirect_to_url(short_code: str):
     conn.close()
 
     return RedirectResponse(url=original_url)
+
+@app.get("/stats/{short_code}")
+def get_url_stats(short_code: str):
+    logger.info(f"Stats request received for short_code: {short_code}")
+    conn = get_db_connection()
+    url_data = conn.execute("SELECT original_url, clicks FROM urls WHERE short_code = ?", (short_code,)).fetchone()
+    
+    if url_data is None: 
+        logger.warning(f"Stats not found for {short_code}.")
+        conn.close()
+        raise HTTPException(status_code=404, detail="URL stats not found")
+        
+    original_url, clicks = url_data
+    
+    conn.close()
+    
+    logger.info(f"Returning stats for {original_url}. Total clicks: {clicks}")
+    
+    return {"original_url": original_url, "clicks": clicks}
