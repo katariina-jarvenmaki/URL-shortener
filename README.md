@@ -25,3 +25,9 @@ PYTHONPATH=./ pytest
 export PYTHONPATH=$(pwd)
 python -m pytest --cov=app --cov-report=term-missing
 ```
+
+## Running Alembic revision
+```bash
+cd /opt/kjc/int/URL-shortener
+alembic revision --autogenerate -m "create urls table"
+```

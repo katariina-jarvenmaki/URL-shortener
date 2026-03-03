@@ -1,7 +1,7 @@
 # app/core/config.py
 
 from functools import lru_cache
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import List
 
 
