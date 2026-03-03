@@ -1,3 +1,6 @@
 app/__pycache__
+__pycache__
+.pytest_cache/
 venv/
 test.txt
+diff.txt
