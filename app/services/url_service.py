@@ -9,7 +9,6 @@ from app.db.models import URL
 from app.utils.short_code import generate_short_code
 from app.core.config import settings
 
-
 SHORT_CODE_LENGTH = 6
 MAX_GENERATION_ATTEMPTS = 5
 

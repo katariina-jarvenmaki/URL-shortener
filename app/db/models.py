@@ -4,7 +4,7 @@ from sqlalchemy import String, Integer, DateTime, func, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 from app.db.base import Base
-
+from typing import Optional
 
 class URL(Base):
     __tablename__ = "urls"
@@ -40,7 +40,7 @@ class URL(Base):
         nullable=False
     )
 
-    last_accessed: Mapped[datetime | None] = mapped_column(
+    last_accessed: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True
     )

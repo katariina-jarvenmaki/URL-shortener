@@ -10,7 +10,7 @@ source venv/bin/activate
 
 ## Run locally
 ```bash
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 Then check:<br> 
 http://127.0.0.1:8000<br>
@@ -23,5 +23,5 @@ http://127.0.0.1:8000/shorten
 ```bash
 PYTHONPATH=./ pytest
 export PYTHONPATH=$(pwd)
-pytest
+python -m pytest --cov=app --cov-report=term-missing
 ```
