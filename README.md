@@ -31,3 +31,9 @@ python -m pytest --cov=app --cov-report=term-missing
 cd /opt/kjc/int/URL-shortener
 alembic revision --autogenerate -m "create urls table"
 ```
+
+## Running project in Docker container
+```bash
+cd /opt/kjc/int/URL-shortener
+docker compose up --build
+```
