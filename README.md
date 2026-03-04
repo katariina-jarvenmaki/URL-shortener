@@ -13,11 +13,11 @@ source venv/bin/activate
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 Then check:<br> 
-http://127.0.0.1:8000<br>
-http://127.0.0.1:8000/docs
+http://localhost:9995<br>
+http://localhost:9995/docs
 
 Test Short URL Endpoint:<br>
-http://127.0.0.1:8000/shorten
+http://localhost:9995/shorten
 
 ## Running a test
 ```bash
