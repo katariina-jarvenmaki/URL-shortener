@@ -40,11 +40,6 @@ http://localhost:9995/docs
 Test Short URL Endpoint:<br>
 http://localhost:9995/shorten
 
-## Run Tests
-```bash
-pytest --cov=app --cov-report=term-missing
-```
-
 ## Running Alembic revision
 ```bash
 cd <your-repo-url>
@@ -55,4 +50,11 @@ alembic revision --autogenerate -m "create urls table"
 ```bash
 cd <your-repo-url>
 docker compose up --build
+```
+
+## Running tests in Docker container
+```bash
+cd <your-repo-url>
+docker compose up --build
+docker compose exec app pytest --cov=app --cov-report=term-missing
 ```
