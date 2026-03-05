@@ -18,9 +18,12 @@ def create_short_url(db: Session, original_url: str) -> str:
     Create a shortened URL or return existing one if already present.
     """
 
+    # ✅ Normalize FIRST (critical fix)
+    normalized_url = original_url.rstrip("/")
+
     # 1️⃣ Check if URL already exists
     existing = db.execute(
-        select(URL).where(URL.original_url == original_url)
+        select(URL).where(URL.original_url == normalized_url)
     ).scalar_one_or_none()
 
     if existing:
@@ -37,7 +40,7 @@ def create_short_url(db: Session, original_url: str) -> str:
         if not collision:
             new_url = URL(
                 short_code=short_code,
-                original_url=original_url,
+                original_url=normalized_url,  # ✅ store normalized version
             )
             db.add(new_url)
             db.commit()
@@ -45,9 +48,8 @@ def create_short_url(db: Session, original_url: str) -> str:
 
             return f"{settings.base_url}/{new_url.short_code}"
 
-    # If we somehow fail multiple times
     raise RuntimeError("Failed to generate unique short code")
-
+    
 
 def get_original_url(db: Session, short_code: str) -> Optional[str]:
     """

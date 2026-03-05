@@ -1,33 +1,60 @@
-# URL-shortener
-URL-shortener project to showcase python use
+# URL Shortener API
 
-## Create venv
+Production-ready URL Shortener built with FastAPI, PostgreSQL, Docker, and Alembic.
+
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+
+## Techstack
+
+FastAPI, PostgreSQL, SQLAlchemy 2.0, Alembic, Docker, Pytest and Pydantic v2
+
+## Features
+
+Shorten URLs, Redirect, Click tracking, Stats endpoint, Collision handling, 90%+ test coverage, Dockerized and Alembic migrations
+
+## Local Setup
+
 ```bash
-cd /opt/kjc/int/URL-shortener
+cd <your-repo-url>
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-## Run locally
-```bash
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+Create .env:
 ```
+DATABASE_URL=sqlite:///./test.db
+BASE_URL=http://localhost:8000
+```
+
+Run:
+```bash
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 9995
+```
+
 Then check:<br> 
-http://127.0.0.1:8000<br>
-http://127.0.0.1:8000/docs
+http://localhost:9995<br>
+http://localhost:9995/docs
 
 Test Short URL Endpoint:<br>
-http://127.0.0.1:8000/shorten
-
-## Running a test
-```bash
-PYTHONPATH=./ pytest
-export PYTHONPATH=$(pwd)
-python -m pytest --cov=app --cov-report=term-missing
-```
+http://localhost:9995/shorten
 
 ## Running Alembic revision
 ```bash
-cd /opt/kjc/int/URL-shortener
+cd <your-repo-url>
 alembic revision --autogenerate -m "create urls table"
+```
+
+## Running project in Docker container
+```bash
+cd <your-repo-url>
+docker compose up --build
+```
+
+## Running tests in Docker container
+```bash
+cd <your-repo-url>
+docker compose up --build
+docker compose exec app pytest --cov=app --cov-report=term-missing
 ```

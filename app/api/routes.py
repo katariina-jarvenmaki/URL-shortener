@@ -27,8 +27,14 @@ def shorten_url(
     request: URLCreate,
     db: Session = Depends(get_db),
 ):
-    short_url = url_service.create_short_url(db, str(request.url))
+    normalized_url = str(request.url).rstrip("/")
+    short_url = url_service.create_short_url(db, normalized_url)
     return {"short_url": short_url}
+
+
+@router.get("/health")
+def health():
+    return {"message": "healthy"}
 
 
 @router.get("/{short_code}")
@@ -63,8 +69,3 @@ def get_url_stats(
         )
 
     return stats
-
-
-@router.get("/health", response_model=MessageResponse)
-def health_check():
-    return {"message": "healthy"}
