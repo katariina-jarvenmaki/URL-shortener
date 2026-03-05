@@ -11,6 +11,6 @@ def test_default_settings_values():
 
     assert settings.app_name == "URL Shortener"
     assert settings.host == "0.0.0.0"
-    assert settings.port == 8000
+    assert settings.port == 9995
     assert settings.debug is True
     assert isinstance(settings.allowed_hosts, list)

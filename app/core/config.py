@@ -12,8 +12,8 @@ class Settings(BaseSettings):
 
     # Server settings
     host: str = "0.0.0.0"
-    port: int = 8000
-    base_url: str = "http://localhost:8000"
+    port: int = 9995
+    base_url: str = "http://localhost:9995"
 
     # Debug flag
     debug: bool = True

@@ -3,7 +3,7 @@
 Production-ready URL Shortener built with FastAPI, PostgreSQL, Docker, and Alembic.
 
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
-![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 
 ## Techstack
@@ -12,7 +12,7 @@ FastAPI, PostgreSQL, SQLAlchemy 2.0, Alembic, Docker, Pytest and Pydantic v2
 
 ## Features
 
-Shorten URLs, Redirect, Click tracking, Stats endpoint, Collision handling, 90%+ test coverage, Dockerized and Alembic migrations
+Shorten URLs, Redirect, Click tracking, Stats endpoint, Collision handling, 99%+ test coverage, Dockerized and Alembic migrations
 
 ## Local Setup
 
@@ -22,10 +22,9 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-Create .env:
+Create .env, copy as this as template:
 ```
-DATABASE_URL=sqlite:///./test.db
-BASE_URL=http://localhost:8000
+.env.example
 ```
 
 Run:
