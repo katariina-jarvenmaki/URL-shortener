@@ -2,6 +2,7 @@
 
 import pytest
 from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
@@ -9,21 +10,18 @@ from app.main import app
 from app.db.base import Base
 from app.db.session import get_db
 
+import os
+os.environ["TESTING"] = "1"
 
 # Use in-memory SQLite for tests
 TEST_DATABASE_URL = "sqlite+pysqlite:///:memory:"
 
-
 @pytest.fixture(scope="function")
 def db_session():
-    """
-    Creates a new database session for a test.
-    Rolls back everything after test finishes.
-    """
-
     engine = create_engine(
         TEST_DATABASE_URL,
         connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
 
     TestingSessionLocal = sessionmaker(
@@ -32,7 +30,6 @@ def db_session():
         bind=engine,
     )
 
-    # Create tables
     Base.metadata.create_all(bind=engine)
 
     db = TestingSessionLocal()

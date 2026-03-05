@@ -1,5 +1,6 @@
 # app/main.py
 
+import logging
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.core.config import settings
@@ -7,11 +8,18 @@ from app.db.session import engine
 from app.db.base import Base
 from app.api.routes import router
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+)
+
+import os
+from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
-    Base.metadata.create_all(bind=engine)
+    if os.getenv("TESTING") != "1":
+        Base.metadata.create_all(bind=engine)
     yield
 
 def create_app() -> FastAPI:

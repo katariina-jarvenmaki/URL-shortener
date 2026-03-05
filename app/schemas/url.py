@@ -14,11 +14,11 @@ class URLResponse(BaseModel):
 
 
 class URLStatsResponse(BaseModel):
-    original_url: HttpUrl
+    original_url: str
     clicks: int
     created_at: datetime
-    last_accessed: Optional[datetime] = None
-
+    last_accessed: Optional[datetime]
+    
 
 class MessageResponse(BaseModel):
     message: str
